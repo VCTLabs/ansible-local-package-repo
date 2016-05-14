@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: 'SJLC'
+  description: 'Install software from locally-maintained package repo'
+  license: BSD
+  min_ansible_version: '1.8'
+
+  platforms:
+  - name: GenericLinux
+
+  categories:
+  - system
+
+dependencies: []
