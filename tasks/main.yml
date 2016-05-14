@@ -1,0 +1,25 @@
+---
+# main tasks file for vctLabs.local-package-repo
+
+- name: create dir for package repo 
+  file:
+    name: "{{dest_basedir}}/{{installable_subdir}}"
+    state: directory
+    mode: 0755
+
+- name: push package repo
+  synchronize: 
+    src: "{{src_basedir}}/{{installable_subdir}}/" 
+    dest: "{{dest_basedir}}/{{installable_subdir}}/" 
+    checksum: yes
+    delete: yes
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: gentoo.yml
+  when: ansible_os_family == "Gentoo"
+

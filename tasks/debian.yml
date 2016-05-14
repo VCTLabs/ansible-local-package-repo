@@ -1,0 +1,25 @@
+---
+# Debian tasks file for vctLabs.local-package-repo
+
+- name: install repo tool 
+  apt:
+    name: reprepro
+    state: present
+
+- name: configure package repo
+  template: 
+    dest: /etc/apt/sources.list.d/local-packages.list
+    src: debian/local-packages.list.j2
+    mode: 0644
+
+- name: generate repo metadata
+  shell: mkdir -p apt && /usr/bin/reprepro -b apt includedeb xenial *.deb
+    chdir: "{{dest_basedir}}/{{installable_subdir}}"
+
+- name: install local packages
+  apt: 
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - "{{package_list}}"
+

@@ -1,0 +1,14 @@
+
+- name: configure package repo 
+  template: 
+    dest: /etc/portage/repos.conf/local-packages.conf
+    src: gentoo/local-packages.conf.j2
+    mode: 0644
+
+- name: install local packages
+  portage: 
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - "{{package_list}}"
+
