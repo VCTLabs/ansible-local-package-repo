@@ -1,3 +1,11 @@
+---
+# Gentoo tasks file for vctLabs.local-package-repo
+
+- name: create dir for repo config
+  file:
+    name: /etc/portage/repos.conf
+    state: directory
+    mode: 0755
 
 - name: configure package repo 
   template: 
@@ -8,7 +16,8 @@
 - name: install local packages
   portage: 
     name: "{{item}}"
-    state: latest
+    state: present
+    #update: yes
   with_items:
     - "{{package_list}}"
 
