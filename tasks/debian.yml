@@ -6,20 +6,44 @@
     name: reprepro
     state: present
 
+- name: create subdir for repo metadata
+  file:
+    name: "{{dest_basedir}}/{{installable_subdir}}/apt/conf"
+    state: directory
+    mode: 0755
+
+- name: get debian release
+  shell: "/usr/bin/lsb_release -c | tr -s '[[:blank:]]' ' ' | cut -f2 -d' '"
+  register: debian_release
+
+- name: get debian architecture
+  command: /usr/bin/dpkg --print-architecture
+  register: debian_architecture
+
+- debug: msg="release={{debian_release.stdout}} arch={{debian_architecture.stdout}}"
+
+- name: create config file for repo tool
+  template:
+    dest: "{{dest_basedir}}/{{installable_subdir}}/apt/conf/distributions"
+    src: debian/reprepro-distributions.j2
+    mode: 0644
+
+- name: generate repo metadata
+  shell: "/usr/bin/reprepro -b apt includedeb {{debian_release.stdout}} *.deb"
+  args:
+    chdir: "{{dest_basedir}}/{{installable_subdir}}"
+
 - name: configure package repo
   template: 
     dest: /etc/apt/sources.list.d/local-packages.list
     src: debian/local-packages.list.j2
     mode: 0644
 
-- name: generate repo metadata
-  shell: mkdir -p apt && /usr/bin/reprepro -b apt includedeb xenial *.deb
-    chdir: "{{dest_basedir}}/{{installable_subdir}}"
-
 - name: install local packages
   apt: 
     name: "{{item}}"
     state: latest
+    update_cache: yes
   with_items:
     - "{{package_list}}"
 

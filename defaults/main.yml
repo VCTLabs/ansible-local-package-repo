@@ -12,6 +12,3 @@ installable_subdir: "{{ansible_distribution}}/{{ansible_distribution_major_versi
 
 # list of packages to be installed from local repo
 package_list: []
-
-# release name if node runs Debian-like OS
-debian_release: stable

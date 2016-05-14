@@ -6,15 +6,15 @@
     name: createrepo
     state: present
 
+- name: generate repo metadata
+  command: "/usr/bin/createrepo -v {{dest_basedir}}/{{installable_subdir}}"
+    
 - name: configure package repo
   template: 
     dest: /etc/yum.repos.d/local-packages.repo
     src: redhat/local-packages.repo.j2
     mode: 0644
 
-- name: generate repo metadata
-  command: "/usr/bin/createrepo -v {{dest_basedir}}/{{installable_subdir}}"
-    
 - name: install local packages
   yum: 
     name: "{{item}}"
