@@ -1,11 +1,21 @@
 ---
 # main tasks file for vctLabs.local-package-repo
 
+# pushing the repo is a multi-step process because synchronize module doesn't 
+# handle 'become' properly, so use non-root user to sync then fix ownership
+
+- name: lookup non-privileged user
+  command: /usr/bin/whoami  
+  register: non_priv_user
+  become: no
+
 - name: create dir for package repo 
   file:
     name: "{{dest_basedir}}/{{installable_subdir}}"
     state: directory
+    owner: "{{non_priv_user.stdout}}"
     mode: 0755
+    recurse: yes
 
 - name: push package repo
   synchronize: 
@@ -13,6 +23,15 @@
     dest: "{{dest_basedir}}/{{installable_subdir}}/" 
     checksum: yes
     delete: yes
+  become: no
+
+- name: make package repo owned by root
+  file:
+    name: "{{dest_basedir}}/{{installable_subdir}}"
+    state: directory
+    owner: root
+    mode: 0755
+    recurse: yes
 
 - include: debian.yml
   when: ansible_os_family == "Debian"
